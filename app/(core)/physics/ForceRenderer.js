@@ -3,8 +3,6 @@
  * Provides consistent, beautiful force vector rendering across all simulations
  */
 
-import { toPixels } from "../constants/Utils.js";
-
 export class ForceRenderer {
   constructor(options = {}) {
     this.config = {
@@ -16,30 +14,39 @@ export class ForceRenderer {
       labelSize: options.labelSize || 12,
       labelOffset: options.labelOffset || 15,
       minMagnitude: options.minMagnitude || 0.01, // Don't draw tiny forces
-      ...options
+      ...options,
     };
 
     // Force type colors
     this.colors = {
-      weight: "#ef4444",      // red
-      normal: "#10b981",      // green
-      friction: "#f59e0b",    // orange
-      applied: "#a855f7",     // purple
-      tension: "#06b6d4",     // cyan
-      spring: "#ec4899",      // pink
-      drag: "#6366f1",        // indigo
-      net: "#fbbf24",         // yellow
-      component: "#fca5a5",   // light red (dashed)
-      ...options.colors
+      weight: "#ef4444", // red
+      normal: "#10b981", // green
+      friction: "#f59e0b", // orange
+      applied: "#a855f7", // purple
+      tension: "#06b6d4", // cyan
+      spring: "#ec4899", // pink
+      drag: "#6366f1", // indigo
+      net: "#fbbf24", // yellow
+      component: "#fca5a5", // light red (dashed)
+      ...options.colors,
     };
   }
 
   /**
    * Draw a force vector
    */
-  drawVector(p, startX, startY, forceX, forceY, color, label = null, options = {}) {
+  drawVector(
+    p,
+    startX,
+    startY,
+    forceX,
+    forceY,
+    color,
+    label = null,
+    options = {}
+  ) {
     const magnitude = Math.sqrt(forceX * forceX + forceY * forceY);
-    
+
     if (magnitude < this.config.minMagnitude) return;
 
     const scaledX = forceX * this.config.scale;
@@ -89,11 +96,7 @@ export class ForceRenderer {
     p.rotate(angle);
     p.fill(color);
     p.noStroke();
-    p.triangle(
-      0, 0,
-      -arrowSize, -arrowSize / 2,
-      -arrowSize, arrowSize / 2
-    );
+    p.triangle(0, 0, -arrowSize, -arrowSize / 2, -arrowSize, arrowSize / 2);
     p.pop();
   }
 
@@ -102,7 +105,8 @@ export class ForceRenderer {
    */
   drawLabel(p, x, y, text, magnitude, color, options = {}) {
     const offset = options.labelOffset || this.config.labelOffset;
-    const showMag = options.showMagnitude !== false && this.config.showMagnitude;
+    const showMag =
+      options.showMagnitude !== false && this.config.showMagnitude;
 
     let labelText = text;
     if (showMag && magnitude !== undefined) {
@@ -111,13 +115,13 @@ export class ForceRenderer {
 
     p.push();
     p.noStroke();
-    
+
     // Background for readability
     p.fill(0, 0, 0, 150);
     const textW = p.textWidth(labelText) + 8;
     const textH = this.config.labelSize + 4;
     p.rect(x + offset - 4, y - textH / 2 - 2, textW, textH, 3);
-    
+
     // Text
     p.fill(color);
     p.textAlign(p.LEFT, p.CENTER);
@@ -132,8 +136,11 @@ export class ForceRenderer {
   drawWeight(p, x, y, mass, gravity, options = {}) {
     const force = mass * gravity;
     this.drawVector(
-      p, x, y,
-      0, force,
+      p,
+      x,
+      y,
+      0,
+      force,
       this.colors.weight,
       options.label || "Weight",
       options
@@ -147,10 +154,13 @@ export class ForceRenderer {
     const normalAngle = angleRad + Math.PI / 2;
     const fx = magnitude * Math.cos(normalAngle);
     const fy = -magnitude * Math.sin(normalAngle);
-    
+
     this.drawVector(
-      p, x, y,
-      fx, fy,
+      p,
+      x,
+      y,
+      fx,
+      fy,
       this.colors.normal,
       options.label || "Normal",
       options
@@ -163,10 +173,13 @@ export class ForceRenderer {
   drawFriction(p, x, y, magnitude, angleRad, options = {}) {
     const fx = magnitude * Math.cos(angleRad);
     const fy = -magnitude * Math.sin(angleRad);
-    
+
     this.drawVector(
-      p, x, y,
-      fx, fy,
+      p,
+      x,
+      y,
+      fx,
+      fy,
       this.colors.friction,
       options.label || "Friction",
       options
@@ -179,10 +192,13 @@ export class ForceRenderer {
   drawApplied(p, x, y, magnitude, angleRad, options = {}) {
     const fx = magnitude * Math.cos(angleRad);
     const fy = -magnitude * Math.sin(angleRad);
-    
+
     this.drawVector(
-      p, x, y,
-      fx, fy,
+      p,
+      x,
+      y,
+      fx,
+      fy,
       this.colors.applied,
       options.label || "Applied",
       options
@@ -193,17 +209,20 @@ export class ForceRenderer {
    * Draw component vectors (dashed by default)
    */
   drawComponents(p, x, y, forceX, forceY, options = {}) {
-    const componentOptions = { 
-      dashed: true, 
+    const componentOptions = {
+      dashed: true,
       strokeWeight: 2,
-      ...options 
+      ...options,
     };
 
     // X component
     if (Math.abs(forceX) > this.config.minMagnitude) {
       this.drawVector(
-        p, x, y,
-        forceX, 0,
+        p,
+        x,
+        y,
+        forceX,
+        0,
         this.colors.component,
         options.xLabel || "Fx",
         componentOptions
@@ -213,8 +232,11 @@ export class ForceRenderer {
     // Y component
     if (Math.abs(forceY) > this.config.minMagnitude) {
       this.drawVector(
-        p, x, y,
-        0, forceY,
+        p,
+        x,
+        y,
+        0,
+        forceY,
         this.colors.component,
         options.yLabel || "Fy",
         componentOptions
@@ -227,11 +249,11 @@ export class ForceRenderer {
    */
   drawInclinedPlaneForces(p, x, y, forces, angleRad, options = {}) {
     const showComponents = options.showComponents !== false;
-    
+
     // Weight (always vertical)
     this.drawWeight(p, x, y, forces.weight.magnitude / 9.81, 9.81, {
       label: "mg",
-      ...options.weightOptions
+      ...options.weightOptions,
     });
 
     // Normal force
@@ -239,41 +261,58 @@ export class ForceRenderer {
 
     // Friction force
     if (Math.abs(forces.friction) > this.config.minMagnitude) {
-      this.drawFriction(p, x, y, forces.friction, angleRad, options.frictionOptions);
+      this.drawFriction(
+        p,
+        x,
+        y,
+        forces.friction,
+        angleRad,
+        options.frictionOptions
+      );
     }
 
     // Applied force
     if (forces.applied.magnitude > this.config.minMagnitude) {
-      const appliedAngleRad = Math.atan2(
-        forces.applied.perpendicular,
-        forces.applied.parallel
-      ) + angleRad;
-      
-      this.drawApplied(p, x, y, forces.applied.magnitude, appliedAngleRad, options.appliedOptions);
+      const appliedAngleRad =
+        Math.atan2(forces.applied.perpendicular, forces.applied.parallel) +
+        angleRad;
+
+      this.drawApplied(
+        p,
+        x,
+        y,
+        forces.applied.magnitude,
+        appliedAngleRad,
+        options.appliedOptions
+      );
     }
 
     // Component vectors
     if (showComponents) {
       p.push();
       p.drawingContext.setLineDash([5, 5]);
-      
+
       // Weight parallel
-      const wpX = -forces.weight.parallel * this.config.scale * Math.cos(angleRad);
-      const wpY = forces.weight.parallel * this.config.scale * Math.sin(angleRad);
-      this.drawVector(p, x, y, wpX, wpY, this.colors.component, "mg‖", { 
-        dashed: true, 
+      const wpX =
+        -forces.weight.parallel * this.config.scale * Math.cos(angleRad);
+      const wpY =
+        forces.weight.parallel * this.config.scale * Math.sin(angleRad);
+      this.drawVector(p, x, y, wpX, wpY, this.colors.component, "mg‖", {
+        dashed: true,
         strokeWeight: 2,
-        showMagnitude: false 
+        showMagnitude: false,
       });
 
       // Weight perpendicular
       const perpAngle = angleRad + Math.PI / 2;
-      const wperpX = forces.weight.perpendicular * this.config.scale * Math.cos(perpAngle);
-      const wperpY = -forces.weight.perpendicular * this.config.scale * Math.sin(perpAngle);
-      this.drawVector(p, x, y, wperpX, wperpY, this.colors.component, "mg⊥", { 
-        dashed: true, 
+      const wperpX =
+        forces.weight.perpendicular * this.config.scale * Math.cos(perpAngle);
+      const wperpY =
+        -forces.weight.perpendicular * this.config.scale * Math.sin(perpAngle);
+      this.drawVector(p, x, y, wperpX, wperpY, this.colors.component, "mg⊥", {
+        dashed: true,
         strokeWeight: 2,
-        showMagnitude: false 
+        showMagnitude: false,
       });
 
       p.drawingContext.setLineDash([]);
@@ -286,8 +325,11 @@ export class ForceRenderer {
    */
   drawNetForce(p, x, y, netX, netY, options = {}) {
     this.drawVector(
-      p, x, y,
-      netX, netY,
+      p,
+      x,
+      y,
+      netX,
+      netY,
       this.colors.net,
       options.label || "Fnet",
       { strokeWeight: 4, ...options }

@@ -187,11 +187,6 @@ export default function InclinedPlane() {
         if (!dragControllerRef.current.isDragging() && dt > 0) {
           bodyRef.current.stepAlongPlane(dt, forces.netParallel, angleRad);
 
-          // Constrain to plane
-          const collided = bodyRef.current.constrainToPlane(
-            planeRef.current.length
-          );
-
           // Update trail
           if (bodyRef.current.trail.enabled) {
             bodyRef.current.updateTrailOnPlane();

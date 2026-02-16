@@ -9,7 +9,7 @@ import { toPixels, toMeters } from "../constants/Utils.js";
 export class InclinedPlaneBody extends PhysicsBody {
   constructor(p, params, initialPosAlongPlane = 0) {
     super(p, params);
-    
+
     // Inclined plane specific state
     this.planeState = {
       posAlongPlane: initialPosAlongPlane, // meters along the incline
@@ -24,7 +24,7 @@ export class InclinedPlaneBody extends PhysicsBody {
   /**
    * Physics step constrained to plane
    */
-  stepAlongPlane(dt, netForceParallel, angleRad) {
+  stepAlongPlane(dt, netForceParallel) {
     if (dt <= 0) return;
 
     // Calculate acceleration from net force
@@ -51,7 +51,7 @@ export class InclinedPlaneBody extends PhysicsBody {
     const distPx = toPixels(this.planeState.posAlongPlane);
     return {
       x: planeStart.x + distPx * Math.cos(angleRad),
-      y: planeStart.y - distPx * Math.sin(angleRad)
+      y: planeStart.y - distPx * Math.sin(angleRad),
     };
   }
 
@@ -61,10 +61,10 @@ export class InclinedPlaneBody extends PhysicsBody {
   setPositionFromScreen(planeStart, angleRad, mouseX, mouseY) {
     const dx = mouseX - planeStart.x;
     const dy = mouseY - planeStart.y;
-    
+
     // Project onto plane direction
     const projectedDist = dx * Math.cos(angleRad) - dy * Math.sin(angleRad);
-    
+
     this.planeState.posAlongPlane = toMeters(projectedDist);
     this.planeState.velAlongPlane = 0;
     this.planeState.accAlongPlane = 0;
@@ -99,8 +99,9 @@ export class InclinedPlaneBody extends PhysicsBody {
   checkHoverOnPlane(p, planeStart, angleRad) {
     const screenPos = this.getScreenPosition(planeStart, angleRad);
     const sizePx = toPixels(this.params.size);
-    
-    this.isHovered = p.dist(screenPos.x, screenPos.y, p.mouseX, p.mouseY) <= sizePx / 2;
+
+    this.isHovered =
+      p.dist(screenPos.x, screenPos.y, p.mouseX, p.mouseY) <= sizePx / 2;
     return this.isHovered;
   }
 
@@ -113,7 +114,7 @@ export class InclinedPlaneBody extends PhysicsBody {
 
     p.push();
     p.translate(screenPos.x, screenPos.y);
-    
+
     // Rotate to align with plane (optional)
     if (options.alignToPlane !== false) {
       p.rotate(-angleRad);
@@ -153,29 +154,29 @@ export class InclinedPlaneBody extends PhysicsBody {
   drawTrailOnPlane(p, planeStart, angleRad) {
     p.push();
     p.noFill();
-    
+
     for (let i = 1; i < this.trail.points.length; i++) {
-      const alpha = (i / this.trail.points.length) * this.trail.alpha;
-      
+      //const alpha = (i / this.trail.points.length) * this.trail.alpha;
+
       // Convert plane positions to screen coordinates
       const prevPx = toPixels(this.trail.points[i - 1].x);
       const currPx = toPixels(this.trail.points[i].x);
-      
+
       const prevScreen = {
         x: planeStart.x + prevPx * Math.cos(angleRad),
-        y: planeStart.y - prevPx * Math.sin(angleRad)
+        y: planeStart.y - prevPx * Math.sin(angleRad),
       };
-      
+
       const currScreen = {
         x: planeStart.x + currPx * Math.cos(angleRad),
-        y: planeStart.y - currPx * Math.sin(angleRad)
+        y: planeStart.y - currPx * Math.sin(angleRad),
       };
-      
+
       p.stroke(this.trail.color);
       p.strokeWeight(2);
       p.line(prevScreen.x, prevScreen.y, currScreen.x, currScreen.y);
     }
-    
+
     p.pop();
   }
 
@@ -183,11 +184,11 @@ export class InclinedPlaneBody extends PhysicsBody {
    * Update trail with plane position
    */
   updateTrailOnPlane() {
-    this.trail.points.push({ 
-      x: this.planeState.posAlongPlane, 
-      y: 0 
+    this.trail.points.push({
+      x: this.planeState.posAlongPlane,
+      y: 0,
     });
-    
+
     if (this.trail.points.length > this.trail.maxLength) {
       this.trail.points.shift();
     }
@@ -197,7 +198,12 @@ export class InclinedPlaneBody extends PhysicsBody {
    * Get kinetic energy
    */
   getKineticEnergy() {
-    return 0.5 * this.params.mass * this.planeState.velAlongPlane * this.planeState.velAlongPlane;
+    return (
+      0.5 *
+      this.params.mass *
+      this.planeState.velAlongPlane *
+      this.planeState.velAlongPlane
+    );
   }
 
   /**

@@ -15,7 +15,7 @@ export function getCanvasHeight() {
  * Convert physics Y (bottom=0, up=positive) to screen Y (top=0, down=positive)
  */
 export const physicsYToScreenY = (physicsY) => {
-  const physicsHeightMeters = CANVAS_HEIGHT / SCALE;
+  //const physicsHeightMeters = CANVAS_HEIGHT / SCALE;
   return CANVAS_HEIGHT - physicsY * SCALE;
 };
 
@@ -23,7 +23,7 @@ export const physicsYToScreenY = (physicsY) => {
  * Convert screen Y (top=0, down=positive) to physics Y (bottom=0, up=positive)
  */
 export const screenYToPhysicsY = (screenY) => {
-  const physicsHeightMeters = CANVAS_HEIGHT / SCALE;
+  //const physicsHeightMeters = CANVAS_HEIGHT / SCALE;
   return (CANVAS_HEIGHT - screenY) / SCALE;
 };
 

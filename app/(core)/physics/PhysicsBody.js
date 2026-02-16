@@ -326,7 +326,7 @@ export class PhysicsBody {
     p.noFill();
 
     for (let i = 1; i < this.trail.points.length; i++) {
-      const alpha = (i / this.trail.points.length) * this.trail.alpha;
+      //const alpha = (i / this.trail.points.length) * this.trail.alpha;
       const prev = this.trail.points[i - 1];
       const curr = this.trail.points[i];
 

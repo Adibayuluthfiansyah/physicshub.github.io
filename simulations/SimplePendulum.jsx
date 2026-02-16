@@ -1,7 +1,7 @@
 // app/pages/simulations/SimplePendulum.jsx
 "use client";
 
-import { useState, useCallback, useMemo, useRef } from "react";
+import { useState, useCallback, useRef } from "react";
 import { usePathname } from "next/navigation.js";
 
 // --- Core Physics & Constants ---
@@ -111,7 +111,7 @@ const INPUT_FIELDS = [
   },
 ];
 
-const SimInfoMapper = (p, bodyState, envParams) => {
+const SimInfoMapper = (bodyState) => {
   const angle =
     (Math.atan2(bodyState.position.x, -bodyState.position.y) * 180) / Math.PI;
 

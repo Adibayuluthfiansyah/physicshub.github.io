@@ -1,7 +1,7 @@
 // app/pages/simulations/BallGravity.jsx
 "use client";
 
-import { useState, useCallback, useMemo, useRef, useEffect } from "react";
+import { useState, useCallback, useMemo, useRef } from "react";
 import { usePathname } from "next/navigation.js";
 
 // --- Core Physics & Constants ---
@@ -330,7 +330,7 @@ export default function BallGravity() {
         setupSimulation();
       };
     },
-    [inputsRef, setIsBlowing]
+    [inputsRef, setIsBlowing, updateSimInfo]
   );
 
   return (

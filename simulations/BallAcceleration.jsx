@@ -255,7 +255,7 @@ export default function BallAcceleration() {
         setupSimulation();
       };
     },
-    [inputsRef]
+    [inputsRef, updateSimInfo]
   );
 
   return (

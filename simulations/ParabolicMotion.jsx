@@ -15,7 +15,6 @@ import {
 import {
   INITIAL_INPUTS,
   INPUT_FIELDS,
-  FORCES,
   SimInfoMapper,
   computeProjectileAnalytics,
 } from "../app/(core)/data/configs/ParabolicMotion.js";

@@ -1,4 +1,3 @@
-import { toMeters } from "../../constants/Utils.js";
 import { gravityTypes, EARTH_G_SI } from "../../constants/Config.js";
 
 // Initial values (SI units, Y-up physics coordinates)
@@ -97,7 +96,6 @@ export const SimInfoMapper = (state, context) => {
     potentialEnergyElastic,
     springForceMag,
     currentLengthM,
-    anchorHeight,
   } = state;
 
   if (!pos || !vel) return {};

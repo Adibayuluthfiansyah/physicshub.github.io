@@ -5,7 +5,7 @@ import { useState, useCallback, useMemo, useRef } from "react";
 import { usePathname } from "next/navigation";
 
 // --- Core Physics & Constants ---
-import { toMeters, toPixels } from "../app/(core)/constants/Utils.js";
+import { toMeters } from "../app/(core)/constants/Utils.js";
 import {
   computeDelta,
   resetTime,
@@ -58,7 +58,7 @@ export default function Test() {
   );
 
   const createBodies = useCallback((p, numBodies, params) => {
-    const { mass, size, gravity, restitution, frictionMu } = params;
+    const { mass, size, restitution } = params;
     const { clientWidth: w, clientHeight: h } = p._userNode;
 
     return Array.from({ length: numBodies }, () => {
@@ -284,7 +284,7 @@ export default function Test() {
         trailLayerRef.current.background(r, g, b);
       };
     },
-    [inputsRef, createBodies]
+    [inputsRef, createBodies, updateSimInfo]
   );
 
   return (

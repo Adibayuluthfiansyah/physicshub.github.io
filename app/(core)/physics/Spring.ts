@@ -1,11 +1,10 @@
-// app/(core)/physics/Spring.ts
-// Nature of Code - Daniel Shiffman
-// Chapter 3: Oscillation
-// FIXED: Now uses Y-UP physics coordinate system consistently
-
-import type p5 from "p5";
+import p5 from "p5";
 import PhysicsBody from "./PhysicsBody.js";
-import { physicsToScreen, toPixels } from "../constants/Utils.js";
+import {
+  physicsToScreen,
+  screenYToPhysicsY,
+  toMeters,
+} from "../constants/Utils.js";
 
 interface SpringConfig {
   color?: string;
@@ -15,22 +14,22 @@ interface SpringConfig {
 }
 
 export default class Spring {
-  public anchor: p5.Vector; // In physics coordinates (Y-up)
-  public restLength: number; // meters
-  public k: number; // N/m
+  public anchor: p5.Vector;
+  public restLength: number;
+  public k: number;
 
   public readonly config: Required<SpringConfig>;
   private p: p5;
 
   constructor(
     p: p5,
-    anchor: p5.Vector, // Physics coordinates (Y-up)
+    anchor: p5.Vector,
     restLengthMeters: number,
     k: number = 50,
     config: SpringConfig = {}
   ) {
     this.p = p;
-    this.anchor = anchor.copy(); // Store in physics coords
+    this.anchor = anchor.copy();
     this.restLength = restLengthMeters;
     this.k = k;
 
@@ -42,28 +41,15 @@ export default class Spring {
     };
   }
 
-  /**
-   * Apply spring force based on Hooke's Law: F = -k * x
-   * ALL calculations in physics coordinates (Y-up)
-   */
   public connect(body: PhysicsBody): void {
-    const Vector = (this.p.constructor as any).Vector;
-
-    // Vector from body to anchor (in physics coords, Y-up)
-    const force = Vector.sub(this.anchor, body.state.position);
+    const force = p5.Vector.sub(this.anchor, body.state.position);
     const currentLength = force.mag();
 
     if (currentLength < 0.0001) return;
 
-    // Displacement from rest length
     const displacement = currentLength - this.restLength;
-
-    // Hooke's Law: F = -k * x
-    // displacement > 0 (stretched): force pulls toward anchor
-    // displacement < 0 (compressed): force pushes away from anchor
     const springForceMag = -this.k * displacement;
 
-    // Apply force in direction from body to anchor
     force.normalize().mult(springForceMag);
     body.applyForce(force);
   }
@@ -72,16 +58,13 @@ export default class Spring {
    * Constrain physical distance between anchor and body
    */
   public constrainLength(body: PhysicsBody, min: number, max: number): void {
-    const Vector = (this.p.constructor as any).Vector;
-    const direction = Vector.sub(body.state.position, this.anchor);
+    const direction = p5.Vector.sub(body.state.position, this.anchor);
     const d = direction.mag();
 
     if (d < min || d > max) {
       const targetLen = this.p.constrain(d, min, max);
       direction.setMag(targetLen);
-      body.state.position = Vector.add(this.anchor, direction);
-
-      // Damp velocity to prevent infinite bouncing
+      body.state.position = p5.Vector.add(this.anchor, direction);
       body.state.velocity.mult(0.5);
     }
   }
@@ -98,7 +81,6 @@ export default class Spring {
     this.p.fill(this.config.anchorColor);
     this.p.circle(screenPos.x, screenPos.y, 12);
 
-    // Draw horizontal line above anchor (ceiling mount)
     this.p.stroke(this.config.anchorColor);
     this.p.strokeWeight(3);
     this.p.line(
@@ -157,9 +139,6 @@ export default class Spring {
     this.p.endShape();
   }
 
-  /**
-   * Get elastic potential energy: PE = 0.5 * k * x²
-   */
   public getElasticPotentialEnergy(body: PhysicsBody): number {
     const displacement = this.getDisplacement(body);
     return 0.5 * this.k * displacement * displacement;
@@ -181,27 +160,16 @@ export default class Spring {
    */
   public setAnchor(x: number, y: number, isScreen: boolean = false): void {
     if (isScreen) {
-      // Convert from screen coordinates to physics coordinates
-      const { screenYToPhysicsY, toMeters } = require("../constants/Utils.js");
       this.anchor.set(toMeters(x), screenYToPhysicsY(y));
     } else {
-      // Already in physics coordinates
       this.anchor.set(x, y);
     }
   }
 
-  /**
-   * Get current length of spring (in meters)
-   */
   public getLength(body: PhysicsBody): number {
-    const Vector = (this.p.constructor as any).Vector;
-    return Vector.dist(this.anchor, body.state.position);
+    return p5.Vector.dist(this.anchor, body.state.position);
   }
 
-  /**
-   * Get displacement from rest length (in meters)
-   * Positive = stretched, Negative = compressed
-   */
   public getDisplacement(body: PhysicsBody): number {
     return this.getLength(body) - this.restLength;
   }

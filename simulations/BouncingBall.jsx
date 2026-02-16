@@ -5,7 +5,7 @@ import { useState, useCallback, useMemo, useRef, useEffect } from "react";
 import { usePathname } from "next/navigation";
 
 // --- Core Physics & Constants ---
-import { toMeters, toPixels } from "../app/(core)/constants/Utils.js";
+import { toMeters } from "../app/(core)/constants/Utils.js";
 import {
   computeDelta,
   resetTime,
@@ -15,7 +15,6 @@ import {
 import {
   INITIAL_INPUTS,
   INPUT_FIELDS,
-  FORCES,
   SimInfoMapper,
 } from "../app/(core)/data/configs/BouncingBall.js";
 import chapters from "../app/(core)/data/chapters.js";
@@ -211,7 +210,7 @@ export default function BouncingBall() {
         );
       };
 
-      const renderScene = (p, forces) => {
+      const renderScene = (p) => {
         const bg = getBackgroundColor();
         const [r, g, b] = Array.isArray(bg) ? bg : [20, 20, 30];
 
@@ -266,7 +265,7 @@ export default function BouncingBall() {
       };
 
       p.mouseReleased = () => {
-        dragControllerRef.current.handleRelease((body) => {
+        dragControllerRef.current.handleRelease(() => {
           // Reset fall time when released
           fallStartTimeRef.current = p.millis();
         });
@@ -306,7 +305,7 @@ export default function BouncingBall() {
         }
       };
     },
-    [inputsRef, maxHeightRef, fallStartTimeRef]
+    [inputsRef, maxHeightRef, fallStartTimeRef, updateSimInfo]
   );
 
   // Cleanup
