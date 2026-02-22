@@ -16,6 +16,7 @@
     "lint:fix": "eslint --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "pre-commit": "node scripts/check-package-lock.js",
     "prepare": "husky install"
   },
   "dependencies": {
